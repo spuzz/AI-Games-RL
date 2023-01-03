@@ -51,6 +51,7 @@ class FrozenLake(EnvironmentModel.Environment):
 
         self.actionChance = 1 - self.slip
 
+        self.state = np.where(self.lake_flat == '&')[0]
         EnvironmentModel.Environment.__init__(self, n_states, n_actions, max_steps, pi, seed=seed)
 
     def step(self, action):
