@@ -15,7 +15,6 @@ class EnvironmentModel:
 
     def draw(self, state, action):
         p = [self.p(ns, state, action) for ns in range(self.n_states)]
-        print(p)
         next_state = self.random_state.choice(self.n_states, p=p)
         reward = self.r(next_state, state, action)
         return next_state, reward

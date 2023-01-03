@@ -2,7 +2,7 @@ import numpy as np
 
 from FrozenLake import FrozenLake
 from GridWorld import GridWorld
-from TabularModelBasedRL import policy_iteration
+from TabularModelBasedRL import policy_iteration, sarsa
 from TabularModelBasedRL import value_iteration
 def main():
     seed = 0
@@ -47,12 +47,12 @@ def main():
 
     print('')
 
-    # print('## Sarsa')
-    # policy, value = sarsa(env, max_episodes, eta=0.5, gamma=gamma,
-    #                       epsilon=0.5, seed=seed)
-    # env.render(policy, value)
-    #
-    # print('')
+    print('## Sarsa')
+    policy, value = sarsa(env, max_episodes, eta=0.5, gamma=gamma,
+                          epsilon=0.5, seed=seed)
+    env.render(policy, value)
+
+    print('')
     #
     # print('## Q-learning')
     # policy, value = q_learning(env, max_episodes, eta=0.5, gamma=gamma,
