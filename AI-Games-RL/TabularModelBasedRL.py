@@ -46,7 +46,7 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
         policy = np.array(policy, dtype=int)
     value = np.zeros(env.n_states, dtype=np.float)
     for iter in range(max_iterations):
-        value = policy_evaluation(env, policy, gamma, theta, max_iterations)
+        value = policy_evaluation(env, policy, gamma, theta, 17)
         policy = policy_improvement(env, policy, value, gamma)
     return policy, value
 
@@ -90,15 +90,19 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
     epsilon = np.linspace(epsilon, 0, max_episodes)
 
     q = np.zeros((env.n_states, env.n_actions))
-
+    first = True
     for i in range(max_episodes):
+
         s = env.reset()
         done = False
-        a = e_greedy(random_state, eta[i], q, s, env.n_actions)
+        a = e_greedy(random_state, epsilon[i], q, s, env.n_actions)
         while not done:
             sNext, r, done = env.step(a)
-            aNext = e_greedy(random_state, eta[i], q, s, env.n_actions)
-            q[s][a] = q[s][a] + epsilon[i] * (r + (gamma * q[sNext][aNext]) - q[s][a])
+            if first and r > 0:
+                print(i)
+                first = False
+            aNext = e_greedy(random_state, epsilon[i], q, sNext, env.n_actions)
+            q[s][a] = q[s][a] + (eta[i] * (r + (gamma * q[sNext][aNext]) - q[s][a]))
             a = aNext
             s = sNext
     policy = q.argmax(axis=1)
@@ -107,11 +111,12 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
     return policy, value
 
 
-def e_greedy(random_state, eta, q, state, n_actions):
-    p = np.array((1 - eta, eta))
-    random = random_state.choice(2)
-    if random == 1 or max(q[state] == 0):
+def e_greedy(random_state, epsilon, q, state, n_actions):
+    p = np.array((1 - epsilon, epsilon))
+    random = random_state.choice(2, p=p)
+    if random == 1:
         a = random_state.choice(n_actions)
     else:
-        a = max(q[state])
-    return int(a)
+        max_index = np.argwhere(q[state] == np.amax(q[state])).flatten()
+        a = np.random.choice(max_index)
+    return a
