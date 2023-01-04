@@ -2,8 +2,10 @@ import numpy as np
 
 from FrozenLake import FrozenLake
 from GridWorld import GridWorld
-from TabularModelBasedRL import policy_iteration, sarsa
+from TabularModelBasedRL import policy_iteration
 from TabularModelBasedRL import value_iteration
+from TabularModelFreeRL import sarsa, q_learning
+from NonTabularModelFreeRL import LinearWrapper, linear_q_learning
 def main():
     seed = 0
 
@@ -53,15 +55,15 @@ def main():
     env.render(policy, value)
 
     print('')
+
+    print('## Q-learning')
+    policy, value = q_learning(env, max_episodes, eta=0.5, gamma=gamma,
+                                epsilon=0.5, seed=seed)
+    env.render(policy, value)
     #
-    # print('## Q-learning')
-    # policy, value = q_learning(env, max_episodes, eta=0.5, gamma=gamma,
-    #                            epsilon=0.5, seed=seed)
-    # env.render(policy, value)
+    print('')
     #
-    # print('')
-    #
-    # linear_env = LinearWrapper(env)
+    linear_env = LinearWrapper(env)
     #
     # print('## Linear Sarsa')
     #
@@ -70,14 +72,14 @@ def main():
     # policy, value = linear_env.decode_policy(parameters)
     # linear_env.render(policy, value)
     #
-    # print('')
+    #print('')
     #
-    # print('## Linear Q-learning')
+    print('## Linear Q-learning')
     #
-    # parameters = linear_q_learning(linear_env, max_episodes, eta=0.5, gamma=gamma,
-    #                                epsilon=0.5, seed=seed)
-    # policy, value = linear_env.decode_policy(parameters)
-    # linear_env.render(policy, value)
+    parameters = linear_q_learning(linear_env, max_episodes, eta=0.5, gamma=gamma,
+                                    epsilon=0.5, seed=seed)
+    policy, value = linear_env.decode_policy(parameters)
+    linear_env.render(policy, value)
     #
     # print('')
     #
