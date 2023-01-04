@@ -1,10 +1,5 @@
-from math import floor
-
 import numpy as np
-import emoji
 import EnvironmentModel
-from enum import Enum
-tile_draw = {0: emoji.emojize(':blue_square:'), 1: emoji.emojize(':yellow_square:'), 2: emoji.emojize('💀'), 3: emoji.emojize(':chequered_flag:'), 4: emoji.emojize(':robot:')}
 
 class GridWorldState():
 
