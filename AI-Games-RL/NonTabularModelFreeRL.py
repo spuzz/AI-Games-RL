@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class LinearWrapper:
     def __init__(self, env):
         self.env = env
@@ -53,8 +54,17 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
         features = env.reset()
 
         q = features.dot(theta)
-
-        # TODO:
+        done = False
+        a = e_greedy(random_state, epsilon[i], q, env.n_actions)
+        while not done:
+            sNext, r, done = env.step(a)
+            qNext = sNext.dot(theta)
+            aNext = e_greedy(random_state, epsilon[i], qNext, env.n_actions)
+            sigma = (r + (gamma * qNext[aNext]) - q[a])
+            theta += (eta[i] * sigma * features[a])
+            a = aNext
+            features = sNext
+            q = qNext
 
     return theta
 
@@ -67,31 +77,40 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
     theta = np.zeros(env.n_features)
 
     for i in range(max_episodes):
-        features = env.reset() #features = state representation
-        q = [] #Q(s,a) values for current state
+        features = env.reset()  # features = state representation
         done = False
-        for a in features:
-            q.append(np.dot(theta, a)) #TODO: perhaps a issue here with the formula
+        q = features.dot(theta)
         while not done:
-            action = e_greedy_nt(np.array(q), random_state, epsilon[i])
-            features_prime, r, done = env.step(action) #"features_prime" = next state
-            delta = r-q[action]
-            q_prime= [] #Q(s',a')
-            for a_prime in features_prime:
-                q_prime.append(np.dot(theta, a_prime)) #TODO: perhaps a issue here with the formula
-            action_prime = np.argmax(np.array(q_prime)) #if tie, first occurrence is always chosen; TODO : break tie randomly
-            delta += gamma*q_prime[action_prime]
-            theta += eta[i]*delta*features[action]
+            action = e_greedy(random_state, epsilon[i], q, env.n_actions)
+            features_prime, r, done = env.step(action)  # "features_prime" = next state
+            delta = r - q[action]
+            q_prime = features_prime.dot(theta)
+            action_prime = e_greedy(random_state, 0, q_prime, env.n_actions)
+            delta += gamma * q_prime[action_prime]
+            theta += eta[i] * delta * features[action]
             features = features_prime
+            q = q_prime
     return theta
 
 
-#e_greedy implementation compatible with linearwrapper
+# e_greedy implementation compatible with linearwrapper
 def e_greedy_nt(actions, random_state, epsilon):
     if random_state.random_sample() < epsilon:  # random number between 0 and 1
-        action = random_state.randint(0,len(actions))  # if random number is smaller than epsilon, pick action at random
+        action = random_state.randint(0,
+                                      len(actions))  # if random number is smaller than epsilon, pick action at random
     else:
-        max_val = np.amax(actions) #
-        max_actions = np.where(actions == max_val)[0] #list of indexes of actions with highest value
-        action = max_actions[random_state.randint(0, len(max_actions))] #one best action is chosen at random
+        max_val = np.amax(actions)  #
+        max_actions = np.where(actions == max_val)[0]  # list of indexes of actions with highest value
+        action = max_actions[random_state.randint(0, len(max_actions))]  # one best action is chosen at random
     return action
+
+
+def e_greedy(random_state, epsilon, q, n_actions):
+    p = np.array((1 - epsilon, epsilon))
+    random = random_state.choice(2, p=p)
+    if random == 1:
+        a = random_state.choice(n_actions)
+    else:
+        max_index = np.argwhere(q == np.amax(q)).flatten()
+        a = np.random.choice(max_index)
+    return a

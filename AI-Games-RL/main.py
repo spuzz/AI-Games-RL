@@ -1,11 +1,15 @@
 import numpy as np
 
+from DeepQLearning import deep_q_network_learning
 from FrozenLake import FrozenLake
+from FrozenLakeImageWrapper import FrozenLakeImageWrapper
 from GridWorld import GridWorld
 from TabularModelBasedRL import policy_iteration
 from TabularModelBasedRL import value_iteration
 from TabularModelFreeRL import sarsa, q_learning
-from NonTabularModelFreeRL import LinearWrapper, linear_q_learning
+from NonTabularModelFreeRL import LinearWrapper, linear_q_learning, linear_sarsa
+
+
 def main():
     seed = 0
 
@@ -30,8 +34,8 @@ def main():
 
     print('# Model-based algorithms')
 
-    print('')
-
+    # print('')
+    #
     # print('## Policy iteration')
     # policy, value = policy_iteration(env, gamma, theta=0.001, max_iterations=128)
     # env.render(policy, value)
@@ -41,46 +45,46 @@ def main():
     # print('## Value iteration')
     # policy, value = value_iteration(env, gamma, theta=0.001, max_iterations=128)
     # env.render(policy, value)
-
-    print('')
-
-    print('# Model-free algorithms')
+    #
+    # print('')
+    #
+    # print('# Model-free algorithms')
     max_episodes = 4000
-
-    print('')
-
-    print('## Sarsa')
-    policy, value = sarsa(env, max_episodes, eta=0.5, gamma=gamma,
-                          epsilon=0.5, seed=seed)
-    env.render(policy, value)
-
-    print('')
-
+    #
+    # print('')
+    #
+    # print('## Sarsa')
+    # policy, value = sarsa(env, max_episodes, eta=0.5, gamma=gamma,
+    #                       epsilon=0.5, seed=seed)
+    # env.render(policy, value)
+    #
+    # print('')
+    #
     print('## Q-learning')
     policy, value = q_learning(env, max_episodes, eta=0.5, gamma=gamma,
                                 epsilon=0.5, seed=seed)
     env.render(policy, value)
-    #
+
     print('')
     #
     linear_env = LinearWrapper(env)
-    #
-    # print('## Linear Sarsa')
-    #
-    # parameters = linear_sarsa(linear_env, max_episodes, eta=0.5, gamma=gamma,
-    #                           epsilon=0.5, seed=seed)
-    # policy, value = linear_env.decode_policy(parameters)
-    # linear_env.render(policy, value)
-    #
-    #print('')
-    #
+
+    print('## Linear Sarsa')
+
+    parameters = linear_sarsa(linear_env, max_episodes, eta=0.5, gamma=gamma,
+                              epsilon=0.5, seed=seed)
+    policy, value = linear_env.decode_policy(parameters)
+    linear_env.render(policy, value)
+
+    print('')
+
     print('## Linear Q-learning')
     #
     parameters = linear_q_learning(linear_env, max_episodes, eta=0.5, gamma=gamma,
                                     epsilon=0.5, seed=seed)
     policy, value = linear_env.decode_policy(parameters)
     linear_env.render(policy, value)
-    #
+
     # print('')
     #
     # image_env = FrozenLakeImageWrapper(env)

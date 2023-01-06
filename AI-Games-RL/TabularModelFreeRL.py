@@ -8,7 +8,6 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
     epsilon = np.linspace(epsilon, 0, max_episodes)
 
     q = np.zeros((env.n_states, env.n_actions))
-    first = True
     for i in range(max_episodes):
 
         s = env.reset()
@@ -16,9 +15,6 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
         a = e_greedy(random_state, epsilon[i], q, s, env.n_actions)
         while not done:
             sNext, r, done = env.step(a)
-            if first and r > 0:
-                print(i)
-                first = False
             aNext = e_greedy(random_state, epsilon[i], q, sNext, env.n_actions)
             q[s][a] = q[s][a] + (eta[i] * (r + (gamma * q[sNext][aNext]) - q[s][a]))
             a = aNext
@@ -51,7 +47,7 @@ def q_learning(env, max_episodes , eta , gamma, epsilon , seed=None):
         while not done:
             a = e_greedy(random_state, epsilon[i], q, s, env.n_actions)
             sNext, r, done = env.step(a)
-            aNext = e_greedy(random_state, epsilon[i], q, sNext, env.n_actions)
+            aNext = e_greedy(random_state, 0, q, sNext, env.n_actions)
             q[s][a] += eta[i]*(r+gamma*q[sNext][aNext]-q[s][a])
             s = sNext
     policy = q.argmax(axis=1)
