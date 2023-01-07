@@ -93,18 +93,6 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
     return theta
 
 
-# e_greedy implementation compatible with linearwrapper
-def e_greedy_nt(actions, random_state, epsilon):
-    if random_state.random_sample() < epsilon:  # random number between 0 and 1
-        action = random_state.randint(0,
-                                      len(actions))  # if random number is smaller than epsilon, pick action at random
-    else:
-        max_val = np.amax(actions)  #
-        max_actions = np.where(actions == max_val)[0]  # list of indexes of actions with highest value
-        action = max_actions[random_state.randint(0, len(max_actions))]  # one best action is chosen at random
-    return action
-
-
 def e_greedy(random_state, epsilon, q, n_actions):
     p = np.array((1 - epsilon, epsilon))
     random = random_state.choice(2, p=p)
