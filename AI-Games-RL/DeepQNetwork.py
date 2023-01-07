@@ -13,12 +13,13 @@ class DeepQNetwork(torch.nn.Module):
 
         self.conv_layer = torch.nn.Conv2d(in_channels=env.state_shape[0], 
                                           out_channels=conv_out_channels,
-                                          kernel_size=kernel_size, stride=1)
+                                          kernel_size=kernel_size, stride=1, padding=1) # added padding=1
 
         h = env.state_shape[1] - kernel_size + 1
         w = env.state_shape[2] - kernel_size + 1
+        # in_features=h * w * conv_out_channels
 
-        self.fc_layer = torch.nn.Linear(in_features=h * w * conv_out_channels, 
+        self.fc_layer = torch.nn.Linear(in_features=env.state_shape[0], # changed in features to env.state_shape[0]
                                         out_features=fc_out_features)
         self.output_layer = torch.nn.Linear(in_features=fc_out_features, 
                                             out_features=env.n_actions)

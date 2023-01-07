@@ -27,8 +27,11 @@ def deep_q_network_learning(env, max_episodes, learning_rate, gamma, epsilon,
                 with torch.no_grad():
                     q = dqn(np.array([state]))[0].numpy()
 
-                qmax = max(q)
+                # qmax = max(q) # i think this was a bug
+                qmax = np.max(q)
+
                 best = [a for a in range(env.n_actions) if np.allclose(qmax, q[a])]
+                print(best) # empty, not populating with actions
                 action = random_state.choice(best)
 
             next_state, reward, done = env.step(action)
