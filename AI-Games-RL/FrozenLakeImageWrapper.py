@@ -44,5 +44,5 @@ class FrozenLakeImageWrapper:
 
         return self.encode_state(state), reward, done
 
-    def render(self, policy=None, value=None):
-        self.env.render(policy, value)
+    def render(self, policy=None, value=None, title=""):
+        self.env.render(policy, value, title)
