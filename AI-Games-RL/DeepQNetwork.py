@@ -5,6 +5,7 @@ import torch.nn.functional as F
 import numpy as np
 from collections import deque
 
+from random import sample
 
 class DeepQNetwork(torch.nn.Module):
 
@@ -38,7 +39,7 @@ class DeepQNetwork(torch.nn.Module):
         return self.output_layer(x)
 
     def train_step(self, transitions, gamma, tdqn):
-        mse = nn.MSELoss()
+        mse = nn.MSELoss(reduction='sum')
 
         states = np.array([transition[0] for transition in transitions])
         actions = np.array([transition[1] for transition in transitions])
@@ -54,20 +55,12 @@ class DeepQNetwork(torch.nn.Module):
             next_q = tdqn(next_states).max(dim=1)[0] * (1 - dones)
         next_q = next_q.to(torch.float32)
         target = torch.Tensor(rewards) + gamma * next_q
-        if (rewards.max() > 0):
-            trap = 0
-        # TODO: the loss is the mean squared error between `q` and `target`
 
+        # TODO: the loss is the mean squared error between `q` and `target`
         self.optimizer.zero_grad()
         loss = mse(q, target)
-        print(loss)
         loss.backward()
-
         self.optimizer.step()
-        t = self(states)
-        t = t.gather(1, torch.Tensor(actions).view(len(transitions), 1).long())
-        t = t.view(len(transitions))
-        trap = 0
 
 
 class ReplayBuffer:
@@ -83,4 +76,5 @@ class ReplayBuffer:
 
     def draw(self, batch_size):
         # TODO:
-        return [self.buffer.pop() for i in range(batch_size)]
+        batch = sample(list(self.buffer), batch_size)
+        return batch
