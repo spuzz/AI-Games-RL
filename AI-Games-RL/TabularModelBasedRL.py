@@ -6,7 +6,7 @@ def policy_evaluation(env, policy, gamma, theta, max_iterations=1, value=None):
         value = np.zeros(env.n_states)
     else:
         value = np.array(value, dtype=np.float)
-
+    iterations = 0
     for i in range(max_iterations):
         changeInValue = 0
         for s in range(value.shape[0]):
@@ -20,11 +20,11 @@ def policy_evaluation(env, policy, gamma, theta, max_iterations=1, value=None):
                         sumNextState += Pass * (Rass + (gamma * value[sNext]))
             value[s] = sumNextState
             changeInValue = max(changeInValue, abs(v - value[s]))
-
+        iterations += 1
         if changeInValue < theta:
             break
 
-    return value
+    return value, iterations
 
 
 def policy_improvement(env, policy, value, gamma):
@@ -50,12 +50,14 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
     else:
         policy = np.array(policy, dtype=int)
     value = np.zeros(env.n_states, dtype=np.float)
+    total_iterations = 0
     for i in range(max_iterations):
-        value = policy_evaluation(env, policy, gamma, theta, 1, value)
+        value, iterations = policy_evaluation(env, policy, gamma, theta, max_iterations, value)
+        total_iterations += iterations
         policy, stable = policy_improvement(env, policy, value, gamma)
         if stable:
             break
-    print("Number of iterations: " + str(i))
+    print("Number of iterations: " + str(total_iterations))
     return policy, value
 
 
