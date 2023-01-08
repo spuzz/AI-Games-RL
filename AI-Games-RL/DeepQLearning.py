@@ -54,6 +54,5 @@ def deep_q_network_learning(env, max_episodes, learning_rate, gamma, epsilon,
         
         returns.append(disc_reward)
 
-    print(len(returns))
-    PlotReturns(returns)
+    #PlotReturns(returns)
     return dqn
