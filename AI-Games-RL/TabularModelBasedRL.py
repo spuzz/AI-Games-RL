@@ -1,13 +1,14 @@
 import numpy as np
 
 
-def policy_evaluation(env, policy, gamma, theta, max_iterations=1):
-    value = np.zeros(env.n_states, dtype=np.float)
+def policy_evaluation(env, policy, gamma, theta, max_iterations=1, value=None):
+    if value is None:
+        value = np.zeros(env.n_states)
+    else:
+        value = np.array(value, dtype=np.float)
 
-    for s in range(value.shape[0]):
-        value[s] = 0
-    changeInValue = 0
-    for iter in range(max_iterations):
+    for i in range(max_iterations):
+        changeInValue = 0
         for s in range(value.shape[0]):
             v = value[s]
             sumNextState = 0
@@ -27,6 +28,7 @@ def policy_evaluation(env, policy, gamma, theta, max_iterations=1):
 
 
 def policy_improvement(env, policy, value, gamma):
+    stable = True
     for pol in range(policy.shape[0]):
         Qsa = np.zeros(env.n_actions, dtype=float)
         for a in range(Qsa.shape[0]):
@@ -34,9 +36,12 @@ def policy_improvement(env, policy, value, gamma):
                 Pass = env.p(sNext, pol, a)
                 Rass = env.r(sNext, pol, a)
                 Qsa[a] += Pass * (Rass + (gamma * value[sNext]))
+        newpol = np.argmax(Qsa)
+        if newpol != policy[pol]:
+            stable = False
         policy[pol] = np.argmax(Qsa)
 
-    return policy
+    return policy, stable
 
 
 def policy_iteration(env, gamma, theta, max_iterations, policy=None):
@@ -45,9 +50,12 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
     else:
         policy = np.array(policy, dtype=int)
     value = np.zeros(env.n_states, dtype=np.float)
-    for iter in range(max_iterations):
-        value = policy_evaluation(env, policy, gamma, theta, 17)
-        policy = policy_improvement(env, policy, value, gamma)
+    for i in range(max_iterations):
+        value = policy_evaluation(env, policy, gamma, theta, 1, value)
+        policy, stable = policy_improvement(env, policy, value, gamma)
+        if stable:
+            break
+    print("Number of iterations: " + str(i))
     return policy, value
 
 
@@ -57,13 +65,8 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
     else:
         value = np.array(value, dtype=np.float)
 
-    value = np.zeros(env.n_states, dtype=float)
-
-    for s in range(value.shape[0]):
-        value[s] = 0
-    changeInValue = 0
-
-    for iter in range(max_iterations):
+    for i in range(max_iterations):
+        changeInValue = 0
         for s in range(value.shape[0]):
             v = value[s]
             Qsa = np.zeros(env.n_actions, dtype=float)
@@ -76,9 +79,10 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
             changeInValue = max(changeInValue, abs((v - value[s])))
         if changeInValue < theta:
             break
+
+    print("Number of iterations: " + str(i))
     policy = np.zeros(env.n_states, dtype=int)
 
-    policy = policy_improvement(env, policy, value, gamma)
+    policy, stable = policy_improvement(env, policy, value, gamma)
 
     return policy, value
-
