@@ -45,6 +45,9 @@ class FrozenLake(EnvironmentModel.Environment):
         # Precalculate chance of taking selected action
         self.actionChance = 1 - self.slip
 
+        textfile = open("output.txt", 'w')
+        textfile.close()
+
         self.state = np.where(self.lake_flat == '&')[0]
         EnvironmentModel.Environment.__init__(self, n_states, n_actions, max_steps, pi, seed=seed)
 

@@ -56,5 +56,5 @@ def deep_q_network_learning(env, max_episodes, learning_rate, gamma, epsilon,
         returns.append(disc_reward)
 
     # plot the discounted rewards
-    PlotReturns(returns, "Deep Q Learning")
+    #PlotReturns(returns, "Deep Q Learning")
     return dqn
