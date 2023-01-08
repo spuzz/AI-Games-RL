@@ -1,4 +1,5 @@
 import numpy as np
+from PlotReturns import PlotReturns
 
 
 def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
@@ -46,15 +47,20 @@ def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
     eta = np.linspace(eta, 0, max_episodes)
     epsilon = np.linspace(epsilon, 0, max_episodes)
     q = np.zeros((env.n_states, env.n_actions))
+    dis_r_arr = [] #discounted returns array
     for i in range(max_episodes):
         done = False
         s = env.reset()
+        dis_r = 0
         while not done:
             a = e_greedy(random_state, epsilon[i], q, s, env.n_actions)
             sNext, r, done = env.step(a)
             aNext = e_greedy(random_state, 0, q, sNext, env.n_actions)
             q[s][a] += eta[i] * (r + gamma * q[sNext][aNext] - q[s][a])
             s = sNext
+            dis_r += r + gamma * q[sNext][aNext]
+        dis_r_arr.append(dis_r)
+    PlotReturns(dis_r_arr)
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
     return policy, value
