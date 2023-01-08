@@ -20,7 +20,6 @@ class DeepQNetwork(torch.nn.Module):
 
         h = env.state_shape[1] - kernel_size + 1
         w = env.state_shape[2] - kernel_size + 1
-        # in_features=h * w * conv_out_channels
 
         self.fc_layer = torch.nn.Linear(in_features=h * w * conv_out_channels,
                                         out_features=fc_out_features)
@@ -33,6 +32,8 @@ class DeepQNetwork(torch.nn.Module):
         x = torch.tensor(x, dtype=torch.float)
 
         # TODO: 
+        # input tensor is passed through a convolutional layer and then flattened, 
+        # it's then passed through a fully connected layer and a linear layer mapping to the actions
         x = F.relu(self.conv_layer(x))
         x = x.view(x.size(0), -1)
         x = F.relu(self.fc_layer(x))
@@ -57,6 +58,7 @@ class DeepQNetwork(torch.nn.Module):
         target = torch.Tensor(rewards) + gamma * next_q
 
         # TODO: the loss is the mean squared error between `q` and `target`
+        # calculates the loss using mean squared error, then backpropagates it through the network
         self.optimizer.zero_grad()
         loss = mse(q, target)
         loss.backward()
@@ -76,5 +78,6 @@ class ReplayBuffer:
 
     def draw(self, batch_size):
         # TODO:
+        # samples a random batch of transitions of size batch_size
         batch = sample(list(self.buffer), batch_size)
         return batch

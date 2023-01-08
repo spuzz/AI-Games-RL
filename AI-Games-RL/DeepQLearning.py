@@ -39,6 +39,7 @@ def deep_q_network_learning(env, max_episodes, learning_rate, gamma, epsilon,
             with torch.no_grad():
                 q_next = dqn(np.array([next_state]))[0].numpy()
             
+            # calculates the discounted rewards
             disc_reward = reward + np.max(q_next)
 
             replay_buffer.append((state, action, reward, next_state, done))
@@ -53,7 +54,7 @@ def deep_q_network_learning(env, max_episodes, learning_rate, gamma, epsilon,
             tdqn.load_state_dict(dqn.state_dict())
         
         returns.append(disc_reward)
-
-    print(len(returns))
-    PlotReturns(returns)
+    
+    # plot the discounted rewards
+    PlotReturns(returns, "Deep Q Learning")
     return dqn
