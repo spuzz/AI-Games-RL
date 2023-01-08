@@ -41,8 +41,8 @@ class LinearWrapper:
 
         return self.encode_state(state), reward, done
 
-    def render(self, policy=None, value=None):
-        self.env.render(policy, value)
+    def render(self, policy=None, value=None, title=""):
+        self.env.render(policy, value, title)
 
 
 def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):

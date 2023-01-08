@@ -122,7 +122,7 @@ class FrozenLake(EnvironmentModel.Environment):
             prob += chance
         return prob
 
-    def render(self, policy=None, value=None):
+    def render(self, policy=None, value=None, title=""):
         if policy is None:
             lake = np.array(self.lake_flat)
 
@@ -151,3 +151,21 @@ class FrozenLake(EnvironmentModel.Environment):
             print('Value:')
             with _printoptions(precision=3, suppress=True):
                 print(value[:-1].reshape(self.lake.shape))
+            
+            # print to output.txt
+            with open("output.txt",'a') as textfile:
+
+                print(title, file=textfile)
+                print('', file=textfile)
+                print('Lake:', file=textfile)
+                print(lake, file=textfile)
+
+                print('Policy:', file=textfile)
+                print(policy.reshape(self.lake.shape), file=textfile)
+
+                print('Value:', file=textfile)
+                with _printoptions(precision=3, suppress=True):
+                    print(value[:-1].reshape(self.lake.shape), file=textfile)
+                print('', file=textfile)
+    
+
