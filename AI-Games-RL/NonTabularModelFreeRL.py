@@ -1,5 +1,7 @@
 import numpy as np
 
+from PlotReturns import PlotReturns
+
 
 class LinearWrapper:
     def __init__(self, env):
@@ -49,7 +51,7 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
     epsilon = np.linspace(epsilon, 0, max_episodes)
 
     theta = np.zeros(env.n_features)
-
+    returnSum = np.zeros(max_episodes)
     for i in range(max_episodes):
         features = env.reset()
 
@@ -65,7 +67,8 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
             a = aNext
             features = sNext
             q = qNext
-
+            returnSum[i] += r + (gamma * q[aNext])
+    PlotReturns(returnSum, "Linear Sarsa Control")
     return theta
 
 

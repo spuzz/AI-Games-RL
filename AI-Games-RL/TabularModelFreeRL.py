@@ -1,5 +1,7 @@
 import numpy as np
 
+from PlotReturns import PlotReturns
+
 
 def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
     random_state = np.random.RandomState(seed)
@@ -9,6 +11,7 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
 
     q = np.zeros((env.n_states, env.n_actions))
     eps = 0
+    returnSum = np.zeros(max_episodes)
     for i in range(max_episodes):
 
         s = env.reset()
@@ -21,8 +24,10 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
             q[s][a] = q[s][a] + (eta[i] * (r + (gamma * q[sNext][aNext]) - q[s][a]))
             a = aNext
             s = sNext
+            returnSum[i] += r + (gamma * q[sNext][aNext])
         if (q.argmax(axis=1) != q_prev.argmax(axis=1)).any():
             eps = i
+    PlotReturns(returnSum, "Sarsa Control")
     print("Episodes needed: " + str(eps))
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
