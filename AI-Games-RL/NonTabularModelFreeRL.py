@@ -69,7 +69,7 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
             features = sNext
             q = qNext
             returnSum[i] += r + (gamma * q[aNext])
-    PlotReturns(returnSum, "Linear Sarsa Control")
+    #PlotReturns(returnSum, "Linear Sarsa Control")
     return theta
 
 
@@ -79,7 +79,7 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
     eta = np.linspace(eta, 0, max_episodes)
     epsilon = np.linspace(epsilon, 0, max_episodes)
     theta = np.zeros(env.n_features)
-    dis_r_arr = []
+    dis_r_arr = [] #discounted returns array
     for i in range(max_episodes):
         features = env.reset()  # features = state representation
         done = False
@@ -97,7 +97,7 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
             q = q_prime
             dis_r += r + gamma * q_prime[action_prime]
         dis_r_arr.append(dis_r)
-    PlotReturns(dis_r_arr)
+    #PlotReturns(dis_r_arr,"Linear Q Learning")
     return theta
 
 

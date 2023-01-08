@@ -28,7 +28,7 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
             returnSum[i] += r + (gamma * q[sNext][aNext])
         if (q.argmax(axis=1) != q_prev.argmax(axis=1)).any():
             eps = i
-    PlotReturns(returnSum, "Sarsa Control")
+    #PlotReturns(returnSum, "Sarsa Control")
     print("Episodes needed: " + str(eps))
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
@@ -65,7 +65,7 @@ def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
             s = sNext
             dis_r += r + gamma * q[sNext][aNext]
         dis_r_arr.append(dis_r)
-    PlotReturns(dis_r_arr)
+    #PlotReturns(dis_r_arr, "Q Learning Control")
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
     return policy, value
