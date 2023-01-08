@@ -1,5 +1,6 @@
 from DeepQNetwork import DeepQNetwork
 from DeepQNetwork import ReplayBuffer
+from PlotReturns import PlotReturns 
 import numpy as np
 import torch
 
@@ -15,6 +16,8 @@ def deep_q_network_learning(env, max_episodes, learning_rate, gamma, epsilon,
                         fc_out_features, seed=seed)
 
     epsilon = np.linspace(epsilon, 0, max_episodes)
+
+    returns = [] 
 
     for i in range(max_episodes):
         state = env.reset()
@@ -33,6 +36,11 @@ def deep_q_network_learning(env, max_episodes, learning_rate, gamma, epsilon,
 
             next_state, reward, done = env.step(action)
 
+            with torch.no_grad():
+                q_next = dqn(np.array([next_state]))[0].numpy()
+            
+            disc_reward = reward + np.max(q_next)
+
             replay_buffer.append((state, action, reward, next_state, done))
 
             state = next_state
@@ -43,5 +51,9 @@ def deep_q_network_learning(env, max_episodes, learning_rate, gamma, epsilon,
 
         if (i % target_update_frequency) == 0:
             tdqn.load_state_dict(dqn.state_dict())
+        
+        returns.append(disc_reward)
 
+    print(len(returns))
+    PlotReturns(returns)
     return dqn
