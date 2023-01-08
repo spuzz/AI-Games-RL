@@ -58,16 +58,26 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
 
         q = features.dot(theta)
         done = False
+        # Select action according to e-greedy policy
         a = e_greedy(random_state, epsilon[i], q, env.n_actions)
         while not done:
             sNext, r, done = env.step(a)
+            # Calculate Q for next state
             qNext = sNext.dot(theta)
+
+            # Select next action using qNext according to e-greedy policy
             aNext = e_greedy(random_state, epsilon[i], qNext, env.n_actions)
+
+            # calculate temporal change
             sigma = (r + (gamma * qNext[aNext]) - q[a])
+
+            # update weights using learning rate, temporal change and features for selected action
             theta += (eta[i] * sigma * features[a])
             a = aNext
             features = sNext
             q = qNext
+
+            # Update array of return values
             returnSum[i] += r + (gamma * q[aNext])
     #PlotReturns(returnSum, "Linear Sarsa Control")
     return theta
@@ -102,11 +112,15 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
 
 
 def e_greedy(random_state, epsilon, q, n_actions):
+    # Probability of exploitation vs exploration based on scaling epsilon
     p = np.array((1 - epsilon, epsilon))
+    
     random = random_state.choice(2, p=p)
     if random == 1:
         a = random_state.choice(n_actions)
     else:
+        # if more than one action has the same max (e.g initial values are all zero)
+        # pick action at random from subset of max values
         max_index = np.argwhere(q == np.amax(q)).flatten()
         a = np.random.choice(max_index)
     return a

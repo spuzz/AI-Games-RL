@@ -42,6 +42,7 @@ class FrozenLake(EnvironmentModel.Environment):
 
         self.absorbing_state = n_states - 1
 
+        # Precalculate chance of taking selected action
         self.actionChance = 1 - self.slip
 
         self.state = np.where(self.lake_flat == '&')[0]
@@ -57,41 +58,55 @@ class FrozenLake(EnvironmentModel.Environment):
     def p(self, next_state, state, action):
 
         prob = 0
+
+        # if in absorbing state then only absorbing state can be next
         if state == self.absorbing_state:
             if next_state == self.absorbing_state:
                 return 1
             else:
                 return 0
 
+        # calculate grid location from 1d state
         x = int(state / self.lake.shape[1])
         y = int(state % self.lake.shape[1])
+
+        # Check currently in hole/goal and if so only absorbing state can be next
         if self.lake[x][y] == '$' or self.lake[x][y] == '#':
             if next_state == self.absorbing_state:
                 return 1
             else:
                 return 0
 
+        # Calculate probably of next_state given current state and action taken is the selected action
         prob += self.CheckStateProb(x, y, self.directions[action], state, next_state, self.actionChance)
+
+        # Calculate probability of next_state for each possible direction taken via slip
         for a in range(self.n_actions):
             prob += self.CheckStateProb(x, y, self.directions[a], state, next_state, self.slip / 4)
 
         return prob
 
     def r(self, next_state, state, action):
+        # if current state is absorbing reward is always 0
         if state == self.absorbing_state:
             return 0
 
+        # calculate grid location from 1d state
         x = int(state / self.lake.shape[1])
         y = int(state % self.lake.shape[1])
+
+        # Only change in reward is at the goal state
         if self.lake[x][y] == '$':
             return 1
         return 0
 
     def CheckStateProb(self, x, y, direction, state, next_state, chance):
+        # direction taken
         x += direction[0]
         y += direction[1]
         prob = 0
 
+        # if direction from action or slip is outside grid then only current state will gain probability
         if x < 0 or x >= self.lake.shape[0]:
             if next_state == state:
                 prob += chance
@@ -102,6 +117,7 @@ class FrozenLake(EnvironmentModel.Environment):
                 prob += chance
             return prob
 
+        # if next_state is reached for this direction then add probability
         if next_state == self.lake.shape[1] * x + y:
             prob += chance
         return prob
