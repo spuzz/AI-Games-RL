@@ -19,10 +19,9 @@ class FrozenLakeImageWrapper:
         for state in range(lake.size):
             # TODO: 
             self.state_image[state] = np.stack([np.zeros(lake.shape)] + lake_image)
-            
+            index = index + 1 if (state % lake.shape[0] == 0 and state != 0) else index
             # encodes the first channel to set the agent location to the given state
-            self.state_image[state][0][index][state % 4] = 1
-            index=index+1 if (state % 4 == 3) else index
+            self.state_image[state][0][index][state % lake.shape[0]] = 1
 
     def encode_state(self, state):
         return self.state_image[state]
